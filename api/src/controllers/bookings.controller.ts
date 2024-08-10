@@ -20,7 +20,7 @@ import {
 import createCalenderEvent from '../utils/createCalendarEvent';
 import moment from 'moment-timezone';
 import notificationController from './notification.controller';
-import { APP_NAME, ASSET_FOLDER } from '../config/keys';
+import { APP_NAME, ASSET_FOLDER, CLIENT_URL } from '../config/keys';
 
 enum BookingStatus {
   ACCEPTED = 'accepted',
@@ -210,6 +210,7 @@ const bookSlot = async (req: Request, res: Response) => {
       'Regarding Session',
       makeTemplate('mentorBookingNotify.hbs', {
         user: user.first_name + ' ' + user.last_name,
+        clientUrl: CLIENT_URL,
         session: {
           topic,
           description,
