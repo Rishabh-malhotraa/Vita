@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid, InputBase, Paper, Box } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
-import { ReactSelect as Select } from 'components/common';
+// import { ReactSelect as Select } from 'components/common';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 import { expertiseOptions } from 'data';
 import UserCard from 'components/UserCard';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -77,6 +82,18 @@ const RenderCards = ({
 
 let timer: any;
 
+// mui select styling
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 const MentorsPage = () => {
   const [expertise, setExpertise] = useRecoilState(expertiseState);
   // @ts-ignore
@@ -85,6 +102,14 @@ const MentorsPage = () => {
   const topic = useRecoilValue(topicState);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
+
+  const handleChange = (event: SelectChangeEvent) => {
+    event.preventDefault();
+    const value = expertiseOptions.find(
+      (item) => item.value === event.target.value,
+    );
+    setExpertise(value);
+  };
 
   const { isLoading, data, fetchNextPage, hasNextPage, refetch } =
     useInfiniteQuery<GetMentorsResponse>(
@@ -146,20 +171,64 @@ const MentorsPage = () => {
           </TextAreaWrapper>
         </Grid>
         <Grid item xs={12} sm={4} lg={3} className="search_wrapper">
-          <Paper
-            sx={{ display: 'flex', minWidth: '240px', marginLeft: '16px' }}>
-            <Select
-              menuPlacement="auto"
-              name="Expertise"
-              sx={{ fontSize: '20px', width: '100%' }}
-              options={[...expertiseOptions, { label: 'All', value: 'All' }]}
-              value={expertise}
-              onChange={setExpertise}
-              isSearchable={matches}
-              classNamePrefix="select"
-              placeholder={<span>Filter by Expertise</span>}
-            />
-          </Paper>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, borderRadius: 4 }}
+            size="small">
+            {!expertiseValue && (
+              <InputLabel
+                id="search"
+                sx={{
+                  color: '#868686',
+                  fontSize: '20px',
+                  paddingLeft: 2,
+                  fontWeight: '400',
+                }}>
+                Filter by Expertise
+              </InputLabel>
+            )}
+            <Paper
+              sx={{ display: 'flex', minWidth: '240px', marginLeft: '16px' }}>
+              <Select
+                labelId="search"
+                fullWidth
+                value={expertiseValue ?? null}
+                onChange={handleChange}
+                defaultValue=""
+                sx={{
+                  padding: '5px 6px',
+                  borderRadius: 1,
+                  color: '#868686',
+                  fontSize: '18px',
+                  backgroundColor: 'black !important',
+                  boxShadow:
+                    '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+                  backgroundImage:
+                    'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
+                }}
+                variant={'standard'}
+                disableUnderline
+                IconComponent={() => (
+                  <i
+                    style={{
+                      position: 'absolute',
+                      top: !expertiseValue ? 10 : 5,
+                      right: 5,
+                      pointerEvents: 'none',
+                    }}>
+                    <ExpandMoreIcon />
+                  </i>
+                )}
+                MenuProps={MenuProps}>
+                {[...expertiseOptions, { label: 'All', value: 'All' }].map(
+                  (item, index) => (
+                    <MenuItem key={index} value={item.value}>
+                      {item.value}
+                    </MenuItem>
+                  ),
+                )}
+              </Select>
+            </Paper>
+          </FormControl>
         </Grid>
       </GridWrapper>
       {content}

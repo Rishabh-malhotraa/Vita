@@ -7,6 +7,9 @@ import {
   Typography,
   Box,
   Tooltip,
+  MenuItem,
+  InputLabel,
+  Paper,
 } from '@mui/material';
 import { Favorite, LinkedIn, Flag } from '@mui/icons-material';
 import { lightGreen } from '@mui/material/colors';
@@ -14,7 +17,9 @@ import PaginatedBookingCard from 'components/PaginatedBookingCard';
 import ShowMoreText from 'react-show-more-text';
 import Divider from '@mui/material/Divider';
 import { commaString } from 'utils/helper';
-import { ReactSelect as Select } from 'components/common';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motivationOptions } from 'data';
 import Appbar from 'components/Appbar';
 import axios from 'axios';
@@ -132,6 +137,19 @@ const getTopics = (topicNums: number[]) =>
 
 let likeDebounceTimer: any;
 
+// mui menuprops
+// mui select styling
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      // width: 250,
+    },
+  },
+};
+
 const UserPage = () => {
   const queryClient = useQueryClient();
   const auth = useRecoilValue(authState);
@@ -148,6 +166,15 @@ const UserPage = () => {
       setLiked(false);
     }
   }, [auth.user]);
+
+  // @ts-ignore
+  const motivationValue = motivation ? motivation?.value : 'All';
+
+  const handleChange = (event: SelectChangeEvent) => {
+    event.preventDefault();
+    setMotivation(event.target.value);
+    setPage(1);
+  };
 
   if (typeof id === 'undefined') return <div />;
   const { isLoading, data } = useQuery(['mentor', id], () => getMentor(id));
@@ -356,21 +383,58 @@ const UserPage = () => {
 
             {/* adding select here */}
             <Grid item xs={12} md={4} sx={{ paddingTop: '1rem' }}>
-              <div style={{ margin: '1rem 0rem' }}>
-                <Select
-                  menuPlacement="auto"
-                  name="Topic"
-                  options={motivationOptions}
-                  // @ts-ignore
-                  onChange={({ value }) => {
-                    setMotivation(value);
-                    setPage(1);
-                  }} // Value - label
-                  isSearchable={true}
-                  classNamePrefix="select"
-                  placeholder={<span>Filter by Motivation</span>}
-                />
-              </div>
+              <FormControl sx={{ minWidth: 120, borderRadius: 4 }} size="small">
+                {!motivation && (
+                  <InputLabel
+                    id="search"
+                    sx={{
+                      color: '#868686',
+                      fontSize: '20px',
+                      fontWeight: '400',
+                    }}>
+                    Filter by Motivation
+                  </InputLabel>
+                )}
+                <Paper sx={{ display: 'flex', minWidth: '240px' }}>
+                  <Select
+                    labelId="search"
+                    fullWidth
+                    value={motivation ?? null}
+                    onChange={handleChange}
+                    defaultValue=""
+                    sx={{
+                      padding: '5px 6px',
+                      borderRadius: 1,
+                      color: '#868686',
+                      fontSize: '18px',
+                      backgroundColor: 'black !important',
+                      boxShadow:
+                        '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+                      backgroundImage:
+                        'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
+                    }}
+                    variant={'standard'}
+                    disableUnderline
+                    IconComponent={() => (
+                      <i
+                        style={{
+                          position: 'absolute',
+                          top: !motivationValue ? 10 : 5,
+                          right: 5,
+                          pointerEvents: 'none',
+                        }}>
+                        <ExpandMoreIcon />
+                      </i>
+                    )}
+                    MenuProps={MenuProps}>
+                    {motivationOptions.map((item, index) => (
+                      <MenuItem key={index} value={item.value}>
+                        {item.value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Paper>
+              </FormControl>
             </Grid>
             <Grid item container width="100%">
               <PaginatedBookingCard

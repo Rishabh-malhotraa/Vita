@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Grid, InputBase, Paper } from '@mui/material';
+import { Grid, InputBase, InputLabel, MenuItem, Paper } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
-import { ReactSelect as Select } from 'components/common';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motivationOptions, shuffleTopics as topics } from 'data';
 import TopicCard from 'components/TopicCard';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -51,6 +53,19 @@ const filterTopics = (topics_: Topic[], motivation: string) => {
   return topics.filter((topic) => topic.motivation === motivation);
 };
 
+// mui menuprops
+// mui select styling
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      // width: 250,
+    },
+  },
+};
+
 const MentorsPage = () => {
   const [motivation, setMotivation] = useRecoilState(motivationState);
   const setTabIndex = useSetRecoilState(tabIndexState);
@@ -63,6 +78,14 @@ const MentorsPage = () => {
 
   // @ts-ignore
   const motivationValue = motivation ? motivation?.value : 'All';
+
+  const handleChange = (event: SelectChangeEvent) => {
+    event.preventDefault();
+    const value = motivationOptions.find(
+      (item) => item.value === event.target.value,
+    );
+    setMotivation(value);
+  };
 
   const fetchMoreData = () => {
     const n = items.length;
@@ -94,20 +117,62 @@ const MentorsPage = () => {
           </TextAreaWrapper>
         </Grid>
         <Grid item xs={12} sm={4} lg={3} className="search_wrapper">
-          <Paper
-            sx={{ display: 'flex', minWidth: '240px', marginLeft: '16px' }}>
-            <Select
-              menuPlacement="auto"
-              name="Motivation"
-              sx={{ fontSize: '20px' }}
-              options={motivationOptions}
-              value={motivation}
-              onChange={setMotivation}
-              isSearchable={matches}
-              classNamePrefix="select"
-              placeholder={<span>Filter by Motivation</span>}
-            />
-          </Paper>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, borderRadius: 4 }}
+            size="small">
+            {!motivationValue && (
+              <InputLabel
+                id="search"
+                sx={{
+                  color: '#868686',
+                  fontSize: '20px',
+                  paddingLeft: 2,
+                  fontWeight: '400',
+                }}>
+                Filter by Motivation
+              </InputLabel>
+            )}
+            <Paper
+              sx={{ display: 'flex', minWidth: '240px', marginLeft: '16px' }}>
+              <Select
+                labelId="search"
+                fullWidth
+                value={motivationValue ?? null}
+                onChange={handleChange}
+                defaultValue=""
+                sx={{
+                  padding: '5px 6px',
+                  borderRadius: 1,
+                  color: '#868686',
+                  fontSize: '18px',
+                  backgroundColor: 'black !important',
+                  boxShadow:
+                    '0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
+                  backgroundImage:
+                    'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
+                }}
+                variant={'standard'}
+                disableUnderline
+                IconComponent={() => (
+                  <i
+                    style={{
+                      position: 'absolute',
+                      top: !motivationValue ? 10 : 5,
+                      right: 5,
+                      pointerEvents: 'none',
+                    }}>
+                    <ExpandMoreIcon />
+                  </i>
+                )}
+                MenuProps={MenuProps}>
+                {motivationOptions.map((item, index) => (
+                  <MenuItem key={index} value={item.value}>
+                    {item.value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Paper>
+          </FormControl>
         </Grid>
       </SearchWrapper>
       <InfiniteScroll

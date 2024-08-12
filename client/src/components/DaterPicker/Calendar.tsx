@@ -12,11 +12,14 @@ import { DurationType } from 'types';
 import { getSlotsByDays } from 'utils/helper';
 import { Stack, Typography } from '@mui/material';
 import moment from 'moment-timezone';
-import { StyledReactSelect } from 'components/common';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { SERVER_URL } from 'config.keys';
 import Select_TEMP from './Select_temp';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Paper } from '@mui/material';
 
 const Wrapper = styled('div')`
   color: white;
@@ -101,23 +104,58 @@ const Calendar: React.FC<CalendarProps> = ({
     <div style={{ backgroundColor: '#292727' }}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Stack spacing={2}>
-          <StyledReactSelect
-            value={timeZone}
-            placeholder={<div>Change TimeZone</div>}
-            onChange={(e: any) => {
-              if (e.value !== timeZone.value) {
-                setDate(null);
-                setTimeslot([]);
-                setSelectedSlot(undefined);
-              }
+          <FormControl sx={{ m: 1, minWidth: 100 }} size="small">
+            <Paper
+              sx={{
+                display: 'flex',
+                minWidth: '240px',
+                backgroundColor: 'transparent',
+                padding: '6px',
+              }}>
+              <Select
+                labelId="time-select-small"
+                id="time-select-small"
+                value={timeZone.value}
+                onChange={(e: any) => {
+                  if (e.value !== timeZone.value) {
+                    setDate(null);
+                    setTimeslot([]);
+                    setSelectedSlot(undefined);
+                  }
 
-              setTimeZone(e);
-            }}
-            classNamePrefix="select"
-            options={moment.tz
-              .names()
-              .map((name) => ({ value: name, label: name }))}
-          />
+                  setTimeZone(e);
+                }}
+                native={true}
+                sx={{
+                  width: '100%',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  padding: '3px 6px',
+                  borderRadius: 1,
+                  color: '#868686',
+                  fontSize: '20px',
+                }}
+                variant={'standard'}
+                IconComponent={(props) => (
+                  <i
+                    style={{
+                      position: 'absolute',
+                      right: 5,
+                      pointerEvents: 'none',
+                    }}>
+                    <ExpandMoreIcon />
+                  </i>
+                )}
+                disableUnderline>
+                {moment.tz.names().map((item, index) => (
+                  <option key={index} value={item.value}>
+                    {item}
+                  </option>
+                ))}
+              </Select>
+            </Paper>
+          </FormControl>
+
           <Typography variant="subtitle1" px={2} mb={1}>
             Your default timezone is{' '}
             <Typography component="span" color="Highlight">
