@@ -18,7 +18,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-[![CI/CD Digital Ocean][action-url]][action-url]
+
 
 <!-- PROJECT LOGO -->
 <br />
