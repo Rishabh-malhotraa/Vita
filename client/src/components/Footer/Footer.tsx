@@ -59,7 +59,7 @@ const Footer = () => (
           spacing={{ xs: 1, sm: 106 }}>
           <Stack direction="column" spacing={1}>
             <Typography variant="caption" color="#777676">
-              &copy; Copyright 2022 - {APP_NAME}
+              &copy; Copyright 2023 - {APP_NAME}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={1}>
